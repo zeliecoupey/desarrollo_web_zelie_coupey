@@ -48,10 +48,10 @@
        
        
         <p>
-            <input type="submit" value="Registrarme">
+            <button type="button" id ="envio" onclick="validarForm()">Registrarme</button>
             <input type="reset" value="Limpiar">
         </p>
     </form>
-<script src="registro-validator.js"></script>
+    <script src="validator.js"></script>
 </body>
 </html>

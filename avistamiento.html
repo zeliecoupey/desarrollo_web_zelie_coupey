@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informar avistamiento | Unión de Ornitólogos de Chile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+<main>
+    <h1>Informar avistamiento</h1>
+
+    <form id="form-avistamiento">
+        <p>
+            <label for="tipoAve">Tipo (select):</label><br>
+            <select id="tipoAve" name="tipoAve">
+                <option value="">Seleccione un tipo</option>
+                <option value="rapaz">Rapaz</option>
+                <option value="acuatica">Acuática</option>
+                <option value="paseriforme">Paseriforme</option>
+                <option value="psitacido">Psitácido</option>
+                <option value="otro">Otro</option>
+            </select>
+            <span class="mensaje-error" id="error-tipoAve"></span>
+        </p>
+        <p>
+            <label for="nombreAve">Nombre (texto):</label><br>
+            <input type="text" id="nombreAve" name="nombreAve" placeholder="Ej. Zorzal común">
+            <span class="mensaje-error" id="error-nombreAve"></span>
+        </p>
+        <p>
+            <label for="lugar">Lugar (texto):</label><br>
+            <input type="text" id="lugar" name="lugar" placeholder="Ej. Parque Bicentenario, Vitacura">
+            <span class="mensaje-error" id="error-lugar"></span>
+        </p>
+        <p>
+            <label for="fechaHora">Fecha y hora:</label><br>
+            <input type="datetime-local" id="fechaHora" name="fechaHora">
+            <span class="mensaje-error" id="error-fechaHora"></span>
+        </p>
+        <p>
+            <label for="archivo">Foto o vídeo:</label><br>
+            <input type="file" id="archivo" name="archivo" accept="image/*,video/*">
+            <span class="mensaje-error" id="error-archivo"></span>
+        </p>
+
+        <p>
+            <button type="button" id="btn-enviar">Agregar avistamiento</button>
+            <input type="reset" value="Limpiar">
+        </p>
+    </form>
+
+    <div class="confirmacion oculto" id="confirmacion" role="status">
+        <p>Avistamiento registrado correctamente.</p>
+        <p><a href="listado.html">Ver listado de avistamientos</a></p>
+    </div>
+</main>
+
+<script src="avistamiento-validator.js"></script>
+</body>
+</html>
