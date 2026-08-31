@@ -3,55 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de registro</title>
+    <title>Registro voluntario | Unión de Ornitólogos de Chile</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<main>
     <h1>Registro voluntario</h1>
 
-    <form action="#" method="post">
+    <form id="form-registro">
         <p>
             <label for="nombre">Nombre (texto):</label><br>
             <input type="text" id="nombre" name="nombre" placeholder="Escribe tu nombre">
+            <span class="mensaje-error" id="error-nombre"></span>
         </p>
         <p>
             <label for="rut">RUT:</label><br>
-            <input type="text" id="rut" name="rut" placeholder="Escribe tu RUT">
+            <input type="text" id="rut" name="rut" placeholder="Ej. 12.345.678-9">
+            <span class="mensaje-error" id="error-rut"></span>
         </p>
         <p>
             <label for="correo">Email:</label><br>
-            <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl" >
+            <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl">
+            <span class="mensaje-error" id="error-correo"></span>
         </p>
         <p>
             <label for="telefono">Teléfono:</label><br>
-            <input type="tel" id="telefono" name="telefono" placeholder="Escribe tu teléfono">
+            <input type="tel" id="telefono" name="telefono" placeholder="Ej. +56 9 1234 5678">
+            <span class="mensaje-error" id="error-telefono"></span>
         </p>
-       
-        
+
         <p>
             <label for="region">Región (select):</label><br>
             <select id="region" name="region">
+                <option value="">Seleccione una región</option>
                 <option value="metropolitana">Región Metropolitana</option>
                 <option value="biobio">Región del Biobío</option>
                 <option value="losrios">Región de Los Ríos</option>
                 <option value="santiago">Región de Santiago</option>
             </select>
+            <span class="mensaje-error" id="error-region"></span>
         </p>
         <p>
             <label for="comuna">Comuna (texto):</label><br>
             <input type="text" id="comuna" name="comuna" placeholder="Escribe tu comuna">
+            <span class="mensaje-error" id="error-comuna"></span>
         </p>
         <p>
             <label for="calleynumero">Calle y número (texto):</label><br>
             <input type="text" id="calleynumero" name="calleynumero" placeholder="Escribe tu dirección">
+            <span class="mensaje-error" id="error-calleynumero"></span>
         </p>
-       
-       
+
         <p>
-            <input type="submit" value="Registrarme">
+            <button type="button" id="btn-registrar">Registrarme</button>
             <input type="reset" value="Limpiar">
         </p>
     </form>
+</main>
+
 <script src="registro-validator.js"></script>
 </body>
 </html>

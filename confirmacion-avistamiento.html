@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avistamiento registrado</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="confirmacion">
+    <p>Avistamiento registrado correctamente.</p>
+    <p>
+        <button type="button" id="btn-ver-listado">Ver listado de avistamientos</button>
+        <button type="button" id="btn-volver-inicio">Volver al inicio</button>
+    </p>
+</main>
+
+<script>
+    // Navega la ventana principal (la que abrió esta ventanita) a la página indicada
+    // y cierra la ventanita. Si no fue abierta como popup, navega la misma ventana.
+    function irA(pagina) {
+        if (window.opener && !window.opener.closed) {
+            window.opener.location.href = pagina;
+            window.close();
+        } else {
+            window.location.href = pagina;
+        }
+    }
+
+    document.getElementById("btn-ver-listado").addEventListener("click", function () {
+        irA("listado.html");
+    });
+
+    document.getElementById("btn-volver-inicio").addEventListener("click", function () {
+        irA("inicio.html");
+    });
+</script>
+
+</body>
+</html>

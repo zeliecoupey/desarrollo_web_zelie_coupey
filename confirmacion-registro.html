@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro confirmado</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="confirmacion">
+    <p>Datos correctos. Usuario registrado.</p>
+    <p><button type="button" id="btn-volver-inicio">Volver al inicio</button></p>
+</main>
+
+<script>
+    document.getElementById("btn-volver-inicio").addEventListener("click", function () {
+        // Si esta página fue abierta como ventana emergente desde registro.html,
+        // llevamos a la ventana original de vuelta al inicio y cerramos la ventanita.
+        if (window.opener && !window.opener.closed) {
+            window.opener.location.href = "inicio.html";
+            window.close();
+        } else {
+            // Si el navegador la abrió como pestaña normal (bloqueó el popup),
+            // simplemente navegamos esta misma ventana al inicio.
+            window.location.href = "inicio.html";
+        }
+    });
+</script>
+
+</body>
+</html>
