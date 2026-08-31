@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de avistamientos | Unión de Ornitólogos de Chile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main>
+    <h1>Listado de avistamientos</h1>
+
+    <p>
+        <label for="filtro-tipo">Filtrar por tipo de ave:</label>
+        <select id="filtro-tipo">
+            <option value="">Todos</option>
+            <option value="rapaz">Rapaz</option>
+            <option value="acuatica">Acuática</option>
+            <option value="paseriforme">Paseriforme</option>
+            <option value="psitacido">Psitácido</option>
+            <option value="otro">Otro</option>
+        </select>
+    </p>
+
+    <table id="tabla-avistamientos">
+        <thead>
+            <tr>
+                <th data-campo="tipo" class="ordenable">Tipo <span class="flecha-orden"></span></th>
+                <th data-campo="nombreAve" class="ordenable">Nombre <span class="flecha-orden"></span></th>
+                <th data-campo="lugar" class="ordenable">Lugar <span class="flecha-orden"></span></th>
+                <th data-campo="fechaHora" class="ordenable">Fecha y hora <span class="flecha-orden"></span></th>
+                <th>Registro</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpo-tabla">
+            <!-- Las filas se generan dinámicamente desde listado.js -->
+        </tbody>
+    </table>
+
+    <p class="sin-resultados oculto" id="sin-resultados">No hay avistamientos que coincidan con el filtro seleccionado.</p>
+
+    <nav aria-label="Paginación de avistamientos">
+        <button type="button" id="btn-pagina-anterior">Anterior</button>
+        <span id="indicador-pagina"></span>
+        <button type="button" id="btn-pagina-siguiente">Siguiente</button>
+    </nav>
+
+    <p><a href="inicio.html">Volver al inicio</a></p>
+</main>
+
+<script src="listado.js"></script>
+</body>
+</html>
