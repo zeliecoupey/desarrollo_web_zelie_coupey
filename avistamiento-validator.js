@@ -8,7 +8,17 @@ var ANIOS_MAXIMOS_HACIA_ATRAS = 2;
 document.addEventListener("DOMContentLoaded", function () {
     var btnEnviar = document.getElementById("btn-enviar");
     btnEnviar.addEventListener("click", validarYAgregar);
+
+    var formulario = document.getElementById("form-avistamiento");
+    formulario.addEventListener("reset", limpiarMensajesError);
 });
+
+function limpiarMensajesError() {
+    var mensajes = document.querySelectorAll("#form-avistamiento .mensaje-error");
+    mensajes.forEach(function (mensaje) {
+        mensaje.textContent = "";
+    });
+}
 
 function validarYAgregar() {
     var esValido = true;

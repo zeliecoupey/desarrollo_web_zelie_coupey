@@ -4,8 +4,18 @@
 document.addEventListener("DOMContentLoaded", function () {
     var btnRegistrar = document.getElementById("btn-registrar");
     btnRegistrar.addEventListener("click", validarYRegistrar);
+
+    var formulario = document.getElementById("form-registro");
+    formulario.addEventListener("reset", limpiarMensajesError);
 });
 
+
+function limpiarMensajesError() {
+    var mensajes = document.querySelectorAll("#form-registro .mensaje-error");
+    mensajes.forEach(function (mensaje) {
+        mensaje.textContent = "";
+    });
+}
 function validarYRegistrar() {
     var esValido = true;
 
@@ -55,18 +65,6 @@ function validarRut(valor) {
     return "";
 }
 
-function calcularDigitoVerificador(numero) {
-    var suma = 0;
-    var multiplo = 2;
-    for (var i = numero.length - 1; i >= 0; i--) {
-        suma += parseInt(numero.charAt(i), 10) * multiplo;
-        multiplo = multiplo < 7 ? multiplo + 1 : 2;
-    }
-    var resto = 11 - (suma % 11);
-    if (resto === 11) return "0";
-    if (resto === 10) return "K";
-    return String(resto);
-}
 
 function validarCorreo(valor) {
     if (valor === "") return "El correo es obligatorio.";
