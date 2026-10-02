@@ -1,106 +1,73 @@
-// Validaciones del formulario de avistamiento (avistamiento.html)
-// Cada función de validación devuelve un mensaje de error (string) o "" si el campo es válido.
-
-// Límite razonable hacia el pasado: no se aceptan avistamientos informados con más
-// de 2 años de antigüedad (evita errores de tipeo como años mal escritos).
+var MAX_ARCHIVOS = 5;
+var MAX_BYTES_ARCHIVO = 20 * 1024 * 1024;
+var EXTENSIONES = ["jpg", "jpeg", "png", "gif", "webp", "mp4", "webm"];
 var ANIOS_MAXIMOS_HACIA_ATRAS = 2;
 
 document.addEventListener("DOMContentLoaded", function () {
-    var btnEnviar = document.getElementById("btn-enviar");
-    btnEnviar.addEventListener("click", validarYAgregar);
-
-    var formulario = document.getElementById("form-avistamiento");
-    formulario.addEventListener("reset", limpiarMensajesError);
+    document.getElementById("form-avistamiento").addEventListener("submit", function (evento) {
+        if (!validarAvistamiento()) evento.preventDefault();
+    });
+    document.getElementById("form-avistamiento").addEventListener("reset", limpiarMensajesError);
 });
 
 function limpiarMensajesError() {
-    var mensajes = document.querySelectorAll("#form-avistamiento .mensaje-error");
-    mensajes.forEach(function (mensaje) {
-        mensaje.textContent = "";
-    });
+    document.querySelectorAll("#form-avistamiento .mensaje-error").forEach(function (m) { m.textContent = ""; });
 }
 
-function validarYAgregar() {
-    var esValido = true;
-
-    esValido = validarCampo("tipoAve", validarTipoAve) && esValido;
-    esValido = validarCampo("nombreAve", validarNombreAve) && esValido;
-    esValido = validarCampo("lugar", validarLugar) && esValido;
-    esValido = validarCampo("fechaHora", validarFechaHora) && esValido;
-    esValido = validarArchivo() && esValido;
-
-    if (esValido) {
-        // Simula el envío al servidor: se abre la ventanita de confirmación
-        window.open(
-            "confirmacion-avistamiento.html",
-            "confirmacionAvistamiento",
-            "width=420,height=220,menubar=no,toolbar=no,location=no"
-        );
-    }
-    // Si no es válido, el formulario se mantiene visible con los mensajes de error ya mostrados
+function validarAvistamiento() {
+    var ok = true;
+    ok = validarCampo("voluntario", function (v) { return v === "" ? "Debe seleccionar un voluntario." : ""; }) && ok;
+    ok = validarCampo("ave", function (v) { return v === "" ? "Debe seleccionar un ave." : ""; }) && ok;
+    ok = validarCampo("lugar", validarLugar) && ok;
+    ok = validarCampo("fechaHora", validarFechaHora) && ok;
+    ok = validarCampo("descripcion", function (v) { return v.length > 500 ? "Máximo 500 caracteres." : ""; }) && ok;
+    ok = validarArchivos() && ok;
+    return ok;
 }
 
-// Ejecuta una función de validación sobre un campo de texto/select y despliega/limpia su mensaje de error
-function validarCampo(idCampo, funcionValidadora) {
-    var campo = document.getElementById(idCampo);
-    var spanError = document.getElementById("error-" + idCampo);
-    var mensaje = funcionValidadora(campo.value.trim());
-    spanError.textContent = mensaje;
-    return mensaje === "";
+function validarCampo(id, fn) {
+    var campo = document.getElementById(id);
+    var span = document.getElementById("error-" + id);
+    var msg = fn(campo.value.trim());
+    span.textContent = msg;
+    return msg === "";
 }
 
-function validarTipoAve(valor) {
-    if (valor === "") return "Debe seleccionar un tipo de ave.";
+function validarLugar(v) {
+    if (v === "") return "El lugar es obligatorio.";
+    if (v.length < 3 || v.length > 100) return "Ingrese un lugar válido (3 a 100 caracteres).";
     return "";
 }
 
-function validarNombreAve(valor) {
-    if (valor === "") return "El nombre del ave es obligatorio.";
-    if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]{2,60}$/.test(valor)) {
-        return "Ingrese solo letras y espacios (2 a 60 caracteres).";
-    }
-    return "";
-}
-
-function validarLugar(valor) {
-    if (valor === "") return "El lugar es obligatorio.";
-    if (valor.length < 3 || valor.length > 100) {
-        return "Ingrese un lugar válido (3 a 100 caracteres).";
-    }
-    return "";
-}
-
-function validarFechaHora(valor) {
-    if (valor === "") return "La fecha y hora del avistamiento son obligatorias.";
-
-    var fechaIngresada = new Date(valor);
+function validarFechaHora(v) {
+    if (v === "") return "La fecha y hora son obligatorias.";
+    var fecha = new Date(v);
     var ahora = new Date();
-
-    if (fechaIngresada > ahora) {
-        return "La fecha y hora no pueden estar en el futuro.";
-    }
-
-    var limiteHaciaAtras = new Date();
-    limiteHaciaAtras.setFullYear(ahora.getFullYear() - ANIOS_MAXIMOS_HACIA_ATRAS);
-
-    if (fechaIngresada < limiteHaciaAtras) {
-        return "La fecha es demasiado antigua (máximo " + ANIOS_MAXIMOS_HACIA_ATRAS + " años atrás).";
-    }
-
+    if (fecha > ahora) return "La fecha y hora no pueden estar en el futuro.";
+    var limite = new Date();
+    limite.setFullYear(ahora.getFullYear() - ANIOS_MAXIMOS_HACIA_ATRAS);
+    if (fecha < limite) return "La fecha es demasiado antigua.";
     return "";
 }
 
-// El input de archivo se valida aparte porque su "valor" relevante son los archivos seleccionados,
-// no el value textual del input.
-function validarArchivo() {
+function validarArchivos() {
     var campo = document.getElementById("archivo");
-    var spanError = document.getElementById("error-archivo");
+    var span = document.getElementById("error-archivo");
+    var archivos = campo.files;
+    var msg = "";
 
-    if (campo.files.length === 0) {
-        spanError.textContent = "Debe adjuntar al menos una foto o vídeo del avistamiento.";
-        return false;
+    if (archivos.length === 0) {
+        msg = "Debe adjuntar al menos una foto o vídeo.";
+    } else if (archivos.length > MAX_ARCHIVOS) {
+        msg = "Puede adjuntar como máximo " + MAX_ARCHIVOS + " archivos.";
+    } else {
+        for (var i = 0; i < archivos.length; i++) {
+            var partes = archivos[i].name.split(".");
+            var ext = partes.length > 1 ? partes.pop().toLowerCase() : "";
+            if (EXTENSIONES.indexOf(ext) === -1) { msg = "Formato no permitido."; break; }
+            if (archivos[i].size > MAX_BYTES_ARCHIVO) { msg = "Cada archivo puede pesar máximo 20 MB."; break; }
+        }
     }
-
-    spanError.textContent = "";
-    return true;
+    span.textContent = msg;
+    return msg === "";
 }

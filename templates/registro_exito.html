@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voluntario registrado | Unión de Ornitólogos de Chile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<main class="confirmacion">
+    <p>Datos correctos. Voluntario registrado exitosamente.</p>
+    <p>
+        <a href="{{ url_for('avistamiento_nuevo', voluntario_id=voluntario_id) }}">Registrar un avistamiento para este voluntario</a>
+        &middot;
+        <a href="{{ url_for('inicio') }}">Continuar al inicio</a>
+    </p>
+</main>
+
+</body>
+</html>

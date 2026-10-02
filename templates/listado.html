@@ -11,44 +11,40 @@
 <main>
     <h1>Listado de avistamientos</h1>
 
-    <p>
-        <label for="filtro-tipo">Filtrar por tipo de ave:</label>
-        <select id="filtro-tipo">
-            <option value="">Todos</option>
-            <option value="rapaz">Rapaz</option>
-            <option value="acuatica">Acuática</option>
-            <option value="paseriforme">Paseriforme</option>
-            <option value="psitacido">Psitácido</option>
-            <option value="otro">Otro</option>
-        </select>
-    </p>
-
+    {% if total == 0 %}
+    <p class="sin-resultados">Aún no hay avistamientos registrados.</p>
+    {% else %}
     <table id="tabla-avistamientos">
         <thead>
             <tr>
-                <th data-campo="tipo" class="ordenable">Tipo <span class="flecha-orden"></span></th>
-                <th data-campo="nombreAve" class="ordenable">Nombre <span class="flecha-orden"></span></th>
-                <th data-campo="lugar" class="ordenable">Lugar <span class="flecha-orden"></span></th>
-                <th data-campo="fechaHora" class="ordenable">Fecha y hora <span class="flecha-orden"></span></th>
+                <th><a href="{{ url_for('listado', orden='ave', dir='desc' if orden=='ave' and direccion=='asc' else 'asc') }}">Nombre</a></th>
+                <th><a href="{{ url_for('listado', orden='lugar', dir='desc' if orden=='lugar' and direccion=='asc' else 'asc') }}">Lugar</a></th>
+                <th><a href="{{ url_for('listado', orden='fecha', dir='desc' if orden=='fecha' and direccion=='asc' else 'asc') }}">Fecha y hora</a></th>
                 <th>Registro</th>
             </tr>
         </thead>
-        <tbody id="cuerpo-tabla">
-            <!-- Las filas se generan dinámicamente desde listado.js -->
+        <tbody>
+            {% for av in avistamientos %}
+            <tr class="fila-clic" data-href="{{ url_for('detalle', avistamiento_id=av.id) }}">
+                <td>{{ av.ave.nombre }}</td>
+                <td>{{ av.lugar }}</td>
+                <td>{{ av.fecha_hora|fecha }}</td>
+                <td>{{ av.registros|length }} archivo(s)</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 
-    <p class="sin-resultados oculto" id="sin-resultados">No hay avistamientos que coincidan con el filtro seleccionado.</p>
-
     <nav aria-label="Paginación de avistamientos">
-        <button type="button" id="btn-pagina-anterior">Anterior</button>
-        <span id="indicador-pagina"></span>
-        <button type="button" id="btn-pagina-siguiente">Siguiente</button>
+        {% if pagina > 1 %}<a href="{{ url_for('listado', page=pagina-1, orden=orden, dir=direccion) }}">Anterior</a>{% endif %}
+        <span>Página {{ pagina }} de {{ total_paginas }}</span>
+        {% if pagina < total_paginas %}<a href="{{ url_for('listado', page=pagina+1, orden=orden, dir=direccion) }}">Siguiente</a>{% endif %}
     </nav>
+    {% endif %}
 
-   <a href="{{ url_for('inicio') }}">Volver al inicio</a>
+    <p><a href="{{ url_for('inicio') }}">Volver al inicio</a></p>
 </main>
 
-<script src="listado.js"></script>
+<script src="{{ url_for('static', filename='listado.js') }}"></script>
 </body>
 </html>

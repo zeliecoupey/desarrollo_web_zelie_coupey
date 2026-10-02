@@ -8,55 +8,62 @@
 </head>
 <body>
 
-
 <main>
     <h1>Informar avistamiento</h1>
-    <p class="leyenda">Todos los campos son obligatorios.</p>
-    <form id="form-avistamiento">
+    <p class="leyenda">Todos los campos son obligatorios, excepto la descripción.</p>
+    {% if not voluntarios %}
+    <p class="mensaje-error">Aún no hay voluntarios registrados. <a href="{{ url_for('registro') }}">Registre uno primero</a>.</p>
+    {% endif %}
+    <form id="form-avistamiento" method="post" action="{{ url_for('avistamiento_nuevo') }}" enctype="multipart/form-data" novalidate>
         <p>
-            <label for="tipoAve">Tipo (select):</label><br>
-            <select id="tipoAve" name="tipoAve">
-                <option value="">Seleccione un tipo</option>
-                <option value="rapaz">Rapaz</option>
-                <option value="acuatica">Acuática</option>
-                <option value="paseriforme">Paseriforme</option>
-                <option value="psitacido">Psitácido</option>
-                <option value="otro">Otro</option>
+            <label for="voluntario">Voluntario (select):</label><br>
+            <select id="voluntario" name="voluntario">
+                <option value="">Seleccione un voluntario</option>
+                {% for v in voluntarios %}
+                <option value="{{ v.id }}"{% if valores.voluntario == v.id|string %} selected{% endif %}>{{ v.nombre }}</option>
+                {% endfor %}
             </select>
-            <span class="mensaje-error" id="error-tipoAve"></span>
+            <span class="mensaje-error" id="error-voluntario">{{ errores.get('voluntario', '') }}</span>
         </p>
         <p>
-            <label for="nombreAve">Nombre (texto):</label><br>
-            <input type="text" id="nombreAve" name="nombreAve" placeholder="Ej. Zorzal común">
-            <span class="mensaje-error" id="error-nombreAve"></span>
+            <label for="ave">Ave (select):</label><br>
+            <select id="ave" name="ave">
+                <option value="">Seleccione un ave</option>
+                {% for a in aves %}
+                <option value="{{ a.id }}"{% if valores.ave == a.id|string %} selected{% endif %}>{{ a.nombre }}</option>
+                {% endfor %}
+            </select>
+            <span class="mensaje-error" id="error-ave">{{ errores.get('ave', '') }}</span>
         </p>
         <p>
             <label for="lugar">Lugar (texto):</label><br>
-            <input type="text" id="lugar" name="lugar" placeholder="Ej. Parque Bicentenario, Vitacura">
-            <span class="mensaje-error" id="error-lugar"></span>
+            <input type="text" id="lugar" name="lugar" placeholder="Ej. Parque Bicentenario, Vitacura" value="{{ valores.lugar }}">
+            <span class="mensaje-error" id="error-lugar">{{ errores.get('lugar', '') }}</span>
         </p>
         <p>
             <label for="fechaHora">Fecha y hora:</label><br>
-            <input type="datetime-local" id="fechaHora" name="fechaHora">
-            <span class="mensaje-error" id="error-fechaHora"></span>
+            <input type="datetime-local" id="fechaHora" name="fechaHora" value="{{ valores.fechaHora }}">
+            <span class="mensaje-error" id="error-fechaHora">{{ errores.get('fechaHora', '') }}</span>
         </p>
         <p>
-            <label for="archivo">Foto o vídeo:</label><br>
-            <input type="file" id="archivo" name="archivo" accept="image/*,video/*">
-            <span class="mensaje-error" id="error-archivo"></span>
+            <label for="descripcion">Descripción (opcional):</label><br>
+            <textarea id="descripcion" name="descripcion" rows="4" cols="40">{{ valores.descripcion }}</textarea>
+            <span class="mensaje-error" id="error-descripcion">{{ errores.get('descripcion', '') }}</span>
         </p>
-
         <p>
-            <button type="button" id="btn-enviar">Agregar avistamiento</button>
+            <label for="archivo">Foto o vídeo (puede elegir varios):</label><br>
+            <input type="file" id="archivo" name="archivo" multiple accept="image/*,video/*">
+            <span class="mensaje-error" id="error-archivo">{{ errores.get('archivo', '') }}</span>
+        </p>
+        <p>
+            <button type="submit" id="btn-enviar">Agregar avistamiento</button>
             <input type="reset" value="Limpiar">
         </p>
     </form>
-    
 
-    <a href="{{ url_for('inicio') }}">Volver al inicio</a>
-
+    <p><a href="{{ url_for('inicio') }}">Volver al inicio</a></p>
 </main>
 
-<script src="avistamiento-validator.js"></script>
+<script src="{{ url_for('static', filename='avistamiento-validator.js') }}"></script>
 </body>
 </html>

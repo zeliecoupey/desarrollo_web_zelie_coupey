@@ -1,105 +1,67 @@
-// Validaciones del formulario de registro voluntario (registro.html)
-// Cada función de validación devuelve un mensaje de error (string) o "" si el campo es válido.
+document.getElementById("region").addEventListener("change", cargarComunas);
+
+function cargarComunas() {
+    var regionId = document.getElementById("region").value;
+    var selectComuna = document.getElementById("comuna");
+    selectComuna.innerHTML = '<option value="">Seleccione una comuna</option>';
+    if (regionId === "") return;
+
+    fetch("/api/comunas/" + regionId)
+        .then(function (r) { return r.json(); })
+        .then(function (comunas) {
+            comunas.forEach(function (c) {
+                var o = document.createElement("option");
+                o.value = c.id;
+                o.textContent = c.nombre;
+                selectComuna.appendChild(o);
+            });
+        });
+}
 
 document.addEventListener("DOMContentLoaded", function () {
-    var btnRegistrar = document.getElementById("btn-registrar");
-    btnRegistrar.addEventListener("click", validarYRegistrar);
-
-    var formulario = document.getElementById("form-registro");
-    formulario.addEventListener("reset", limpiarMensajesError);
+    document.getElementById("form-registro").addEventListener("submit", function (evento) {
+        if (!validarRegistro()) evento.preventDefault();
+    });
+    document.getElementById("form-registro").addEventListener("reset", limpiarMensajesError);
 });
 
-
 function limpiarMensajesError() {
-    var mensajes = document.querySelectorAll("#form-registro .mensaje-error");
-    mensajes.forEach(function (mensaje) {
-        mensaje.textContent = "";
-    });
-}
-function validarYRegistrar() {
-    var esValido = true;
-
-    esValido = validarCampo("nombre", validarNombre) && esValido;
-    esValido = validarCampo("rut", validarRut) && esValido;
-    esValido = validarCampo("correo", validarCorreo) && esValido;
-    esValido = validarCampo("telefono", validarTelefono) && esValido;
-    esValido = validarCampo("region", validarRegion) && esValido;
-    esValido = validarCampo("comuna", validarComuna) && esValido;
-    esValido = validarCampo("calleynumero", validarCalleYNumero) && esValido;
-
-    if (esValido) {
-        // Simula el envío al servidor: se abre una ventanita de confirmación,
-        // tal como se muestra en la maqueta ("Datos correctos. Usuario registrado.")
-        window.open(
-            "confirmacion-registro.html",
-            "confirmacionRegistro",
-            "width=400,height=220,menubar=no,toolbar=no,location=no"
-        );
-    }
-    // Si no es válido, el formulario se mantiene visible con los mensajes de error ya mostrados
+    document.querySelectorAll("#form-registro .mensaje-error").forEach(function (m) { m.textContent = ""; });
 }
 
-// Ejecuta una función de validación sobre un campo y despliega/limpia su mensaje de error
-function validarCampo(idCampo, funcionValidadora) {
-    var campo = document.getElementById(idCampo);
-    var spanError = document.getElementById("error-" + idCampo);
-    var mensaje = funcionValidadora(campo.value.trim());
-    spanError.textContent = mensaje;
-    return mensaje === "";
+function validarRegistro() {
+    var ok = true;
+    ok = validarCampo("nombre", validarNombre) && ok;
+    ok = validarCampo("correo", validarCorreo) && ok;
+    ok = validarCampo("telefono", validarTelefono) && ok;
+    ok = validarCampo("region", validarRegion) && ok;
+    ok = validarCampo("comuna", validarComuna) && ok;
+    return ok;
 }
 
-function validarNombre(valor) {
-    if (valor === "") return "El nombre es obligatorio.";
-    if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]{2,60}$/.test(valor)) {
-        return "Ingrese solo letras y espacios (2 a 60 caracteres).";
-    }
+function validarCampo(id, fn) {
+    var campo = document.getElementById(id);
+    var span = document.getElementById("error-" + id);
+    var msg = fn(campo.value.trim());
+    span.textContent = msg;
+    return msg === "";
+}
+
+function validarNombre(v) {
+    if (v === "") return "El nombre es obligatorio.";
+    if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]{2,60}$/.test(v)) return "Ingrese solo letras y espacios (2 a 60 caracteres).";
     return "";
 }
-
-function validarRut(valor) {
-    if (valor === "") return "El RUT es obligatorio.";
-    var limpio = valor.replace(/\./g, "").replace(/\s/g, "").toUpperCase();
-    if (!/^[0-9]+-[0-9K]$/.test(limpio)) {
-        return "Formato inválido. Use el formato 12345678-9.";
-    }
+function validarCorreo(v) {
+    if (v === "") return "El correo es obligatorio.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return "Ingrese un correo válido.";
     return "";
 }
-
-
-function validarCorreo(valor) {
-    if (valor === "") return "El correo es obligatorio.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
-        return "Ingrese un correo con formato válido (ej. nombre@dominio.cl).";
-    }
+function validarTelefono(v) {
+    if (v === "") return "El teléfono es obligatorio.";
+    var limpio = v.replace(/\s/g, "");
+    if (!/^(\+?56)?9\d{8}$/.test(limpio)) return "Ingrese un celular chileno válido (ej. +56 9 1234 5678).";
     return "";
 }
-
-function validarTelefono(valor) {
-    if (valor === "") return "El teléfono es obligatorio.";
-    var limpio = valor.replace(/\s/g, "");
-    if (!/^(\+?56)?9\d{8}$/.test(limpio)) {
-        return "Ingrese un celular chileno válido (ej. +56 9 1234 5678).";
-    }
-    return "";
-}
-
-function validarRegion(valor) {
-    if (valor === "") return "Debe seleccionar una región.";
-    return "";
-}
-
-function validarComuna(valor) {
-    if (valor === "") return "La comuna es obligatoria.";
-    if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]{2,40}$/.test(valor)) {
-        return "Ingrese solo letras y espacios (2 a 40 caracteres).";
-    }
-    return "";
-}
-
-function validarCalleYNumero(valor) {
-    if (valor === "") return "La dirección es obligatoria.";
-    if (!/^.{5,80}$/.test(valor)) {
-        return "Ingrese una dirección válida (mínimo 5 caracteres).";
-    }
-    return "";
-}
+function validarRegion(v) { return v === "" ? "Debe seleccionar una región." : ""; }
+function validarComuna(v) { return v === "" ? "Debe seleccionar una comuna." : ""; }

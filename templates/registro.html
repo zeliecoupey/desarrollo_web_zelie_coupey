@@ -10,62 +10,52 @@
 
 <main>
     <h1>Registro voluntario</h1>
-        <p class="leyenda">Todos los campos son obligatorios.</p>
-    <form id="form-registro">
+    <p class="leyenda">Todos los campos son obligatorios.</p>
+    <form id="form-registro" method="post" action="{{ url_for('registro') }}" novalidate>
         <p>
             <label for="nombre">Nombre (texto):</label><br>
-            <input type="text" id="nombre" name="nombre" placeholder="Escribe tu nombre">
-            <span class="mensaje-error" id="error-nombre"></span>
-        </p>
-        <p>
-            <label for="rut">RUT:</label><br>
-            <input type="text" id="rut" name="rut" placeholder="Ej. 12.345.678-9">
-            <span class="mensaje-error" id="error-rut"></span>
+            <input type="text" id="nombre" name="nombre" placeholder="Escribe tu nombre" value="{{ valores.nombre }}">
+            <span class="mensaje-error" id="error-nombre">{{ errores.get('nombre', '') }}</span>
         </p>
         <p>
             <label for="correo">Email:</label><br>
-            <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl">
-            <span class="mensaje-error" id="error-correo"></span>
+            <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl" value="{{ valores.correo }}">
+            <span class="mensaje-error" id="error-correo">{{ errores.get('correo', '') }}</span>
         </p>
         <p>
             <label for="telefono">Teléfono:</label><br>
-            <input type="tel" id="telefono" name="telefono" placeholder="Ej. +56 9 1234 5678">
-            <span class="mensaje-error" id="error-telefono"></span>
+            <input type="tel" id="telefono" name="telefono" placeholder="Ej. +56 9 1234 5678" value="{{ valores.telefono }}">
+            <span class="mensaje-error" id="error-telefono">{{ errores.get('telefono', '') }}</span>
         </p>
-
         <p>
             <label for="region">Región (select):</label><br>
             <select id="region" name="region">
                 <option value="">Seleccione una región</option>
-                <option value="metropolitana">Región Metropolitana</option>
-                <option value="biobio">Región del Biobío</option>
-                <option value="losrios">Región de Los Ríos</option>
-                <option value="santiago">Región de Santiago</option>
+                {% for r in regiones %}
+                <option value="{{ r.id }}"{% if valores.region == r.id|string %} selected{% endif %}>{{ r.nombre }}</option>
+                {% endfor %}
             </select>
-            <span class="mensaje-error" id="error-region"></span>
+            <span class="mensaje-error" id="error-region">{{ errores.get('region', '') }}</span>
         </p>
         <p>
-            <label for="comuna">Comuna (texto):</label><br>
-            <input type="text" id="comuna" name="comuna" placeholder="Escribe tu comuna">
-            <span class="mensaje-error" id="error-comuna"></span>
+            <label for="comuna">Comuna (select):</label><br>
+            <select id="comuna" name="comuna">
+                <option value="">Seleccione una comuna</option>
+                {% for c in comunas %}
+                <option value="{{ c.id }}"{% if valores.comuna == c.id|string %} selected{% endif %}>{{ c.nombre }}</option>
+                {% endfor %}
+            </select>
+            <span class="mensaje-error" id="error-comuna">{{ errores.get('comuna', '') }}</span>
         </p>
         <p>
-            <label for="calleynumero">Calle y número (texto):</label><br>
-            <input type="text" id="calleynumero" name="calleynumero" placeholder="Escribe tu dirección">
-            <span class="mensaje-error" id="error-calleynumero"></span>
-        </p>
-
-        <p>
-            <button type="button" id="btn-registrar">Registrarme</button>
+            <button type="submit" id="btn-registrar">Registrarme</button>
             <input type="reset" value="Limpiar">
         </p>
     </form>
-    </form>
 
-    <a href="{{ url_for('inicio') }}">Volver al inicio</a>
-
+    <p><a href="{{ url_for('inicio') }}">Volver al inicio</a></p>
 </main>
 
-<script src="registro-validator.js"></script>
+<script src="{{ url_for('static', filename='registro-validator.js') }}"></script>
 </body>
 </html>

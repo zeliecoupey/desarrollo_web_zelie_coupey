@@ -13,6 +13,12 @@
 </header>
 
 <main>
+    {% with mensajes = get_flashed_messages() %}
+    {% for m in mensajes %}
+    <div class="confirmacion"><p>{{ m }}</p></div>
+    {% endfor %}
+    {% endwith %}
+
     <h2>Menú</h2>
     <nav>
         <ul>
@@ -22,6 +28,21 @@
             <li><a href="{{ url_for('estadisticas') }}">Estadísticas</a></li>
         </ul>
     </nav>
+
+    <h2>Últimos avistamientos</h2>
+    {% if ultimos %}
+    <ul>
+        {% for av in ultimos %}
+        <li>
+            <strong>{{ av.ave.nombre }}</strong> &ndash; {{ av.lugar }}<br>
+            {{ av.fecha_hora|fecha }} &middot; informado por {{ av.voluntario.nombre }}
+            &middot; <a href="{{ url_for('detalle', avistamiento_id=av.id) }}">Ver detalle</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="sin-resultados">Aún no hay avistamientos registrados.</p>
+    {% endif %}
 </main>
 
 </body>
