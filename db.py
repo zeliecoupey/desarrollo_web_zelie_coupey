@@ -53,6 +53,7 @@ class Avistamiento(Base):
     voluntario = relationship("Voluntario")
     ave = relationship("Ave")
     registros = relationship("Registro", back_populates="avistamiento", cascade="all, delete-orphan")
+    comentarios = relationship("Comentario", back_populates="avistamiento", cascade="all, delete-orphan")
 
 
 class Registro(Base):
@@ -74,3 +75,13 @@ class Registro(Base):
         return {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
                 "gif": "image/gif", "webp": "image/webp",
                 "mp4": "video/mp4", "webm": "video/webm"}.get(ext, "application/octet-stream")
+        
+class Comentario(Base):
+    __tablename__ = "comentario"
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String(80), nullable=False)
+    texto = Column(String(300), nullable=False)
+    fecha = Column(DateTime, nullable=False)
+    avistamiento_id = Column(Integer, ForeignKey("avistamiento.id"), nullable=False)
+
+    avistamiento = relationship("Avistamiento", back_populates="comentarios")

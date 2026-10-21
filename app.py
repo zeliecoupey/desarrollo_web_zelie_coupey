@@ -2,6 +2,7 @@ import math
 import os
 import uuid
 from datetime import datetime
+from db import Ave, Avistamiento, Comentario, Comuna, Region, Registro, Session, Voluntario
 
 from flask import Flask, abort, flash, jsonify, redirect, render_template, request, send_from_directory, url_for
 from sqlalchemy import func, select
@@ -172,3 +173,46 @@ def estadisticas():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
+@app.route("/api/avistamientos/<int:avistamiento_id>/comentarios", methods=["GET"])
+def api_listar_comentarios(avistamiento_id):
+    sesion = Session()
+    consulta = (
+        select(Comentario)
+        .where(Comentario.avistamiento_id == avistamiento_id)
+        .order_by(Comentario.fecha.desc())
+    )
+    comentarios = sesion.execute(consulta).scalars().all()
+    return jsonify([
+        {"nombre": c.nombre, "texto": c.texto, "fecha": c.fecha.strftime("%d-%m-%Y %H:%M")}
+        for c in comentarios
+    ])
+
+
+@app.route("/api/avistamientos/<int:avistamiento_id>/comentarios", methods=["POST"])
+def api_agregar_comentario(avistamiento_id):
+    sesion = Session()
+    if sesion.get(Avistamiento, avistamiento_id) is None:
+        abort(404)
+
+    valores = {
+        "nombre": request.form.get("nombre", "").strip(),
+        "texto": request.form.get("texto", "").strip(),
+    }
+    errores = validaciones.validar_comentario(valores)
+    if errores:
+        return jsonify({"errores": errores}), 400
+
+    comentario = Comentario(
+        nombre=valores["nombre"],
+        texto=valores["texto"],
+        fecha=datetime.now(),
+        avistamiento_id=avistamiento_id,
+    )
+    sesion.add(comentario)
+    sesion.commit()
+    return jsonify({
+        "nombre": comentario.nombre,
+        "texto": comentario.texto,
+        "fecha": comentario.fecha.strftime("%d-%m-%Y %H:%M"),
+    }), 201

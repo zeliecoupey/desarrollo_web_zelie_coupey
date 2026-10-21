@@ -109,3 +109,17 @@ def validar_archivos(archivos):
             return "Cada archivo puede pesar como máximo %d MB." % (MAX_BYTES_ARCHIVO // (1024 * 1024)), []
 
     return "", archivos
+
+def validar_comentario(v):
+    errores = {}
+    if v["nombre"] == "":
+        errores["nombre"] = "El nombre es obligatorio."
+    elif len(v["nombre"]) < 3 or len(v["nombre"]) > 50:
+        errores["nombre"] = "El nombre debe tener entre 3 y 50 caracteres."
+
+    if v["texto"] == "":
+        errores["texto"] = "El comentario es obligatorio."
+    elif len(v["texto"]) < 5:
+        errores["texto"] = "El comentario debe tener al menos 5 caracteres."
+
+    return errores
