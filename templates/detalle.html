@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,6 +11,7 @@
 
 <main>
     <h1>Detalle del avistamiento</h1>
+
     <dl>
         <dt>Ave</dt><dd>{{ av.ave.nombre }}</dd>
         <dt>Lugar</dt><dd>{{ av.lugar }}</dd>
@@ -19,20 +21,93 @@
     </dl>
 
     <h2>Fotos y vídeos</h2>
+
     {% for r in av.registros %}
         {% if r.es_video %}
         <video controls preload="metadata" style="max-width:100%">
             <source src="{{ url_for('archivo', registro_id=r.id) }}" type="{{ r.mimetype }}">
         </video>
         {% else %}
-        <img src="{{ url_for('archivo', registro_id=r.id) }}" alt="Foto de {{ av.ave.nombre }}" style="max-width:100%">
+        <img src="{{ url_for('archivo', registro_id=r.id) }}"
+             alt="Foto de {{ av.ave.nombre }}"
+             style="max-width:100%">
         {% endif %}
     {% else %}
     <p class="sin-resultados">Sin archivos asociados.</p>
     {% endfor %}
 
-    <p><a href="{{ url_for('listado') }}">Volver al listado</a> | <a href="{{ url_for('inicio') }}">Volver al inicio</a></p>
+    <!-- SECCIÓN DE COMENTARIOS -->
+
+    <section id="seccion-comentarios">
+
+        <h2>Comentarios</h2>
+
+        <!-- Mensaje de estado -->
+        <p id="mensaje-comentarios" role="status" aria-live="polite"></p>
+
+        <!-- Lista de comentarios -->
+        <div id="lista-comentarios">
+            <p>Cargando comentarios...</p>
+        </div>
+
+        <!-- Formulario para agregar un comentario -->
+        <h3>Agregar un comentario</h3>
+
+        <form id="form-comentario">
+
+            <div>
+                <label for="nombre-comentario">
+                    Nombre:
+                </label>
+
+                <input
+                    type="text"
+                    id="nombre-comentario"
+                    name="nombre"
+                    minlength="3"
+                    maxlength="50"
+                    required
+                >
+            </div>
+
+            <div>
+                <label for="texto-comentario">
+                    Comentario:
+                </label>
+
+                <textarea
+                    id="texto-comentario"
+                    name="texto"
+                    minlength="5"
+                    maxlength="300"
+                    required
+                ></textarea>
+            </div>
+
+            <button type="submit">
+                Agregar comentario
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- FIN DE LA SECCIÓN DE COMENTARIOS -->
+
+    <p>
+        <a href="{{ url_for('listado') }}">Volver al listado</a> |
+        <a href="{{ url_for('inicio') }}">Volver al inicio</a>
+    </p>
+
 </main>
+
+<!-- Identificador del avistamiento para JavaScript -->
+<script>
+    const AVISTAMIENTO_ID = {{ av.id | tojson }};
+</script>
+
+<!-- JavaScript de comentarios -->
+<script src="{{ url_for('static', filename='comentarios.js') }}" defer></script>
 
 </body>
 </html>

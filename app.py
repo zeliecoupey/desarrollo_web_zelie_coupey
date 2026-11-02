@@ -171,22 +171,34 @@ def estadisticas():
     return render_template("estadisticas.html")
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+
     
+
 @app.route("/api/avistamientos/<int:avistamiento_id>/comentarios", methods=["GET"])
 def api_listar_comentarios(avistamiento_id):
     sesion = Session()
+
+    # Verificar que el avistamiento existe
+    if sesion.get(Avistamiento, avistamiento_id) is None:
+        abort(404)
+
     consulta = (
         select(Comentario)
         .where(Comentario.avistamiento_id == avistamiento_id)
         .order_by(Comentario.fecha.desc())
     )
+
     comentarios = sesion.execute(consulta).scalars().all()
+
     return jsonify([
-        {"nombre": c.nombre, "texto": c.texto, "fecha": c.fecha.strftime("%d-%m-%Y %H:%M")}
+        {
+            "nombre": c.nombre,
+            "texto": c.texto,
+            "fecha": c.fecha.strftime("%d-%m-%Y %H:%M")
+        }
         for c in comentarios
     ])
+
 
 
 @app.route("/api/avistamientos/<int:avistamiento_id>/comentarios", methods=["POST"])
@@ -216,3 +228,72 @@ def api_agregar_comentario(avistamiento_id):
         "texto": comentario.texto,
         "fecha": comentario.fecha.strftime("%d-%m-%Y %H:%M"),
     }), 201
+
+@app.route("/api/estadisticas")
+def api_estadisticas():
+    sesion = Session()
+
+    # 1. Avistamientos por día
+    consulta_dias = (
+        select(
+            func.date(Avistamiento.fecha_hora).label("fecha"),
+            func.count(Avistamiento.id).label("total")
+        )
+        .group_by(func.date(Avistamiento.fecha_hora))
+        .order_by(func.date(Avistamiento.fecha_hora))
+    )
+
+    avistamientos_por_dia = sesion.execute(consulta_dias).all()
+
+    # 2. Avistamientos por especie de ave
+    consulta_aves = (
+        select(
+            Ave.nombre.label("ave"),
+            func.count(Avistamiento.id).label("total")
+        )
+        .join(Avistamiento, Avistamiento.ave_id == Ave.id)
+        .group_by(Ave.id, Ave.nombre)
+        .order_by(func.count(Avistamiento.id).desc())
+    )
+
+    avistamientos_por_ave = sesion.execute(consulta_aves).all()
+
+    # 3. Voluntarios por comuna
+    consulta_comunas = (
+        select(
+            Comuna.nombre.label("comuna"),
+            func.count(Voluntario.id).label("total")
+        )
+        .join(Voluntario, Voluntario.comuna_id == Comuna.id)
+        .group_by(Comuna.id, Comuna.nombre)
+        .order_by(func.count(Voluntario.id).desc())
+    )
+
+    voluntarios_por_comuna = sesion.execute(consulta_comunas).all()
+
+    return jsonify({
+        "avistamientos_por_dia": [
+            {
+                "fecha": fecha.strftime("%Y-%m-%d"),
+                "total": total
+            }
+            for fecha, total in avistamientos_por_dia
+        ],
+        "avistamientos_por_ave": [
+            {
+                "ave": ave,
+                "total": total
+            }
+            for ave, total in avistamientos_por_ave
+        ],
+        "voluntarios_por_comuna": [
+            {
+                "comuna": comuna,
+                "total": total
+            }
+            for comuna, total in voluntarios_por_comuna
+        ]
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True)

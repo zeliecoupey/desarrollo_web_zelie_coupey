@@ -1,61 +1,79 @@
-# desarrollo_web_zelie_coupey
+# CC5002 - Desarrollo de Aplicaciones WEB
+## Tarea 3
 
-CC5002 - Tarea 2
+### Descripción
 
-Sistema de registro de avistamientos de aves (Unión de Ornitólogos de Chile)
+Este proyecto corresponde a la Tarea 3 del curso CC5002 – Desarrollo de Aplicaciones WEB. Consiste en complementar la aplicación desarrollada en la Tarea 2, implementada con Flask y MySQL, incorporando estadísticas y comentarios asociados a los avistamientos.
 
-Continuación del prototipo de la Tarea 1: ahora con servidor en Python + Flask, base de datos MySQL y acceso a datos con SQLAlchemy.
+### Tecnologías utilizadas
 
-## Cómo ejecutarlo
+- Python
+- Flask
+- MySQL
+- SQLAlchemy
+- HTML5
+- CSS3
+- JavaScript
+- Chart.js
 
-1. Crear la base de datos (desde la carpeta `sql/`):
+### Funcionalidades implementadas
 
-mysql -u root -p
-source sql/tarea2.sql;
-source sql/region-comuna.sql;
-source sql/aves.sql;
+#### 1. Estadísticas
 
-2. Instalar dependencias: `pip install flask sqlalchemy pymysql cryptography werkzeug`
-3. Ejecutar: `python app.py` y abrir http://127.0.0.1:5000
+La aplicación incluye una pantalla de estadísticas que obtiene los datos desde la base de datos mediante una ruta de Flask y utiliza llamadas asíncronas con `fetch` para generar los gráficos en el lado del cliente.
 
-## Decisiones de diseño e implementación
+Se implementaron los siguientes gráficos:
 
-### Cambios en el formulario de registro respecto a la Tarea 1
-En la Tarea 1, el formulario de registro de voluntario incluía los campos RUT y "calle y número". Se decidió eliminarlos en esta tarea, porque el modelo de datos entregado en `tarea2.sql` no contempla columnas para ellos en la tabla `voluntario`. El enunciado permite ajustar el modelo, pero se optó por respetar el esquema entregado tal como está.
+- **Gráfico de líneas:** muestra la cantidad de avistamientos registrados por día.
+- **Gráfico de torta:** muestra el total de avistamientos por especie, utilizando el campo `nombre` de la tabla `ave`.
+- **Gráfico de barras:** muestra la cantidad de voluntarios registrados por comuna.
 
-Región y comuna pasaron de ser un `select` fijo y un campo de texto libre, a dos `select` alimentados desde la base de datos. La comuna se carga dinámicamente según la región elegida, mediante una petición `fetch` a la ruta `/api/comunas/<region_id>`, que consulta la tabla `comuna` filtrando por `region_id`.
+El gráfico de torta utiliza el nombre de la especie porque el modelo de datos de la Tarea 2 no contiene un atributo separado para el tipo de ave.
 
-### Cambios en el formulario de avistamiento
-El campo de texto libre para el nombre del ave y el `select` de "tipo" de ave de la Tarea 1 se reemplazaron por un único `select` que lista las aves de la tabla `ave`, ya que el modelo guarda `ave_id` y no un tipo ni un nombre libre. Por lo mismo, el filtro por tipo de ave que existía en el listado de la Tarea 1 ya no está disponible.
+La pantalla de estadísticas incluye un enlace para volver a la portada del sistema.
 
-Se agregó un `select` de voluntario, obligatorio, para asociar el avistamiento a quien lo informa. Cuando el voluntario recién se registra y elige "Registrar un avistamiento para este voluntario", este `select` llega preseleccionado.
+#### 2. Comentarios en avistamientos
 
-Se agregó también un campo de descripción, opcional, ya que la tabla `avistamiento` contempla una columna `descripcion` que admite valores nulos.
+Al consultar un avistamiento, la aplicación permite:
 
-### Reemplazo de las ventanas de confirmación
-En la Tarea 1, al validar un formulario se abría una ventanita con `window.open()` simulando la confirmación del servidor. En esta tarea, ambos formularios envían sus datos a una URL de Flask mediante un `POST` real. Si el registro de voluntario resulta exitoso, se redirige a una página de confirmación que ofrece registrar un avistamiento para ese voluntario o volver al inicio. Si el avistamiento se registra con éxito, se redirige directamente al inicio con un mensaje de confirmación.
+- Visualizar los comentarios asociados al avistamiento.
+- Mostrar la fecha, el nombre del comentarista y el texto de cada comentario.
+- Agregar un nuevo comentario mediante un formulario.
+- Validar los datos ingresados tanto en el cliente como en el servidor.
+- Enviar y recibir comentarios de manera asíncrona mediante `fetch`, sin recargar la página.
+
+Los comentarios se almacenan en la tabla `comentario` de la base de datos.
 
 ### Validaciones
-Las validaciones de JavaScript de la Tarea 1 se mantuvieron, con los ajustes necesarios para los campos que pasaron a ser `select`. Los formularios llevan el atributo `novalidate`, para que el navegador no muestre sus propios mensajes de validación y dejen ver los mensajes del proyecto.
 
-El servidor repite las mismas validaciones del lado de Flask, antes de insertar cualquier dato en la base, ya que las validaciones de JavaScript se pueden omitir fácilmente. Si el servidor detecta un error, vuelve a mostrar el formulario con los datos ya escritos y los mensajes de error correspondientes, sin perder lo que el usuario había ingresado.
+Para el ingreso de comentarios se consideran las siguientes reglas:
 
-### Archivos subidos
-Se permite adjuntar más de un archivo (foto o vídeo) por avistamiento, de acuerdo a lo solicitado. Cada archivo se guarda en el servidor con un nombre único generado automáticamente, para evitar que dos archivos distintos se sobrescriban entre sí o que el nombre original del archivo cause problemas al guardarlo. El nombre original se guarda aparte, solo para mostrarlo al usuario. Por cada archivo se crea una fila en la tabla `registro`, asociada al avistamiento correspondiente.
+- El nombre del comentarista es obligatorio y debe tener entre 3 y 50 caracteres.
+- El texto del comentario es obligatorio y debe tener al menos 5 caracteres.
+- Las validaciones se realizan en el cliente y nuevamente en el servidor.
+- Se verifican los parámetros recibidos en las rutas para evitar solicitudes inválidas.
 
-Se validan en el servidor la cantidad máxima de archivos, su extensión y su tamaño, antes de guardarlos.
+### Decisiones de implementación
 
-### Portada
-La portada muestra los dos últimos avistamientos agregados a la base de datos, ordenados por el identificador (`id`) en forma descendente, en vez de ordenarlos por la fecha del avistamiento. Esto corresponde a los últimos avistamientos *informados*, que no son necesariamente los más recientes en términos de la fecha en que ocurrió el avistamiento.
+- Se utilizó `fetch` para realizar las solicitudes asíncronas desde JavaScript.
+- Se utilizó Chart.js para generar los gráficos estadísticos en el navegador.
+- Las estadísticas se calculan a partir de los datos almacenados en MySQL.
+- El gráfico de torta agrupa los avistamientos por nombre de especie, debido a que la tabla `ave` no posee un campo específico para el tipo de ave.
 
-### Listado de avistamientos
-El listado se obtiene directamente desde la base de datos y se pagina en el servidor. Se puede ordenar por ave, lugar o fecha y hora, haciendo clic en el encabezado de la columna correspondiente. Al hacer clic en una fila, se accede al detalle del avistamiento, que muestra la información completa junto con las fotos y vídeos asociados.
+### Ejecución del proyecto
 
-### Estadísticas
-**Esta sección aún no está conectada a la base de datos.** Se mantiene tal como se entregó en la Tarea 1, con gráficos SVG construidos a partir de datos inventados.
+1. Tener Python, Flask y MySQL instalados.
+2. Crear y configurar la base de datos utilizada en la Tarea 2.
+3. Ejecutar el script SQL proporcionado para crear la tabla `comentario`.
+4. Configurar las credenciales de conexión a la base de datos en el proyecto.
+5. Ejecutar la aplicación Flask:
 
-## Tecnologías utilizadas
-- Python 3, Flask
-- SQLAlchemy
-- MySQL
-- HTML5, CSS3, JavaScript
+   ```bash
+   python app.py
+   ```
+
+6. Abrir la aplicación en el navegador utilizando la dirección local indicada por Flask.
+
+### Autor
+
+Zélie Coupey
